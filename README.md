@@ -20,13 +20,14 @@ Cahier des charges :
 - musique qui change
 - menus avec choix de skin de personnage :
   affichage des skins et sauvegarde du skin selectionné dans un fichier
-- menu de mort une fois les vies perdu avec affichage des scores
+- menu de mort une fois les vies perdues avec affichage des scores
 - 3 niveaux avec arrieres plans différents
 - mode infini
 - mode avec choix : 1 et 3 vies
 - perte de vie quand il y a une collision avec un tuyau
+- géreration aléatoire des tuyaux
 - invincibilité de 3s apres avoir perdu une vie et ralentissement temporaire du décor
 - controles : touche espace pour faire remonter le personnage
-- systeme de gravité : le personnage 
+- systeme de gravité : le personnage tombe automatiquement et la barre espace lui donne une impulsion 
 - skin de personnages debloquable par certaines conditions  (le score)
 - style pixel art
