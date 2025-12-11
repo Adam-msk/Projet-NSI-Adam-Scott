@@ -25,4 +25,4 @@ Cahier des charges :
 - mode avec choix entre 1 et 3 vies
 - controles : touche espace et clique gauche de la souris pour les menus et faire sauter le personnage
 - skin de personnages debloquable par certaines conditions (certain avec le nombre de morts, d'autre avec le score)
--style 2D
+-style pixel art
