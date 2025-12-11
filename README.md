@@ -11,4 +11,5 @@ Le nombre de points est calculé en fonction du nombre de tuyaux évités.
 
 
 Cahier des charges : 
--système de highscore
+>système de highscore
+
