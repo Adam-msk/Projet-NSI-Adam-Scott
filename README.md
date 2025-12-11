@@ -18,12 +18,15 @@ Cahier des charges :
 - système de highscore sauvegardé dans des fichiers en fonction du nombre de vie et du mode : niveau ou infini
 - vitesse de défilement du décors qui augmente au fur et a mesure
 - musique qui change
-- menus avec choix de skin de personnage
-- menu de mort avec affichage des scores
+- menus avec choix de skin de personnage :
+  affichage des skins et sauvegarde du skin selectionné dans un fichier
+- menu de mort une fois les vies perdu avec affichage des scores
 - 3 niveaux avec arrieres plans différents
 - mode infini
 - mode avec choix : 1 et 3 vies
-- invincibilité de 3s apres avoir perdu une vie
+- perte de vie quand il y a une collision avec un tuyau
+- invincibilité de 3s apres avoir perdu une vie et ralentissement temporaire du décor
 - controles : touche espace pour faire remonter le personnage
-- skin de personnages debloquable par certaines conditions (certain avec le nombre de morts, d'autre avec le score)
+- systeme de gravité : le personnage 
+- skin de personnages debloquable par certaines conditions  (le score)
 - style pixel art
