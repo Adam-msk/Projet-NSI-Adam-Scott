@@ -15,14 +15,15 @@ Le nombre de points est calculé en fonction du nombre de tuyaux évités.
 
 Cahier des charges : 
 - créé avec Pygame
-- système de highscore sauvegardé
-- vitesse qui augmente au fur et a mesure
-- musique qui change avec le fond
-- menus avec choix de personnages
+- système de highscore sauvegardé dans des fichiers en fonction du nombre de vie et du mode : niveau ou infini
+- vitesse de défilement du décors qui augmente au fur et a mesure
+- musique qui change
+- menus avec choix de skin de personnage
 - menu de mort avec affichage des scores
-- 3/4 niveaux avec arrieres plans différents
+- 3 niveaux avec arrieres plans différents
 - mode infini
-- mode avec choix entre 1 et 3 vies
-- controles : touche espace et clique gauche de la souris pour les menus et faire sauter le personnage
+- mode avec choix : 1 et 3 vies
+- invincibilité de 3s apres avoir perdu une vie
+- controles : touche espace pour faire remonter le personnage
 - skin de personnages debloquable par certaines conditions (certain avec le nombre de morts, d'autre avec le score)
 - style pixel art
