@@ -24,3 +24,4 @@ Cahier des charges :
 - mode infini
 - mode avec choix entre 1 et 3 vies
 - controles : touche espace et clique gauche de la souris pour les menus et faire sauter le personnage
+- skin de personnages debloquable par certaines conditions
