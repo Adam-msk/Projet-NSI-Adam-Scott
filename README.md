@@ -6,7 +6,7 @@ Il doit éviter les tuyaux qui apparaissent aléatoirement et qui défilent.
 Le nombre de points est calculé en fonction du nombre de tuyaux évités.
 
 
-<img width="300" height="168" alt="image" src="https://github.com/user-attachments/assets/cfaefc53-dc9a-46b1-b5f7-c20876e3d123" />
+![la présentation de Flappy bird.] <img width="300" height="168" alt="image" src="https://github.com/user-attachments/assets/cfaefc53-dc9a-46b1-b5f7-c20876e3d123" />
 ## les tuyeaux
 <img width="275" height="183" alt="image" src="https://github.com/user-attachments/assets/f47d440b-de86-41c6-bf36-4ad679c94218" />
 
