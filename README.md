@@ -15,7 +15,7 @@ Cahier des charges :
 - créé avec Pygame
 - système de highscore sauvegardé
 - vitesse qui augmente au fur et a mesure
-- musique qui change
+- musique qui change avec le fond
 - menus avec choix de personnages
 - menu de mort avec affichage des scores
 - 3/4 niveaux avec arrieres plans différents
