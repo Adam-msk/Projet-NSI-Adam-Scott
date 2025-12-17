@@ -37,3 +37,5 @@ Le nombre de points est calculé en fonction du nombre de tuyaux évités.
 - systeme de gravité : le personnage tombe automatiquement et la barre espace lui donne une impulsion 
 - skin de personnages debloquable par certaines conditions  (le score)
 - style pixel art
+
+### Planning
