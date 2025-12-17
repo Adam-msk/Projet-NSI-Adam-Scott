@@ -38,5 +38,5 @@ Le nombre de points est calculé en fonction du nombre de tuyaux évités.
 - skin de personnages debloquable par certaines conditions  (le score)
 - style pixel art
 
-### 📆 Planning 🗓️
+### 📆 Planning 📆
  Le lien pour accéder au [planning](https://trello.com/invite/b/694258c3b7b0ef91d1756917/ATTIdf9b06da3f4f9e29d8f87d9c2c1abd3014D52F7D/-)
