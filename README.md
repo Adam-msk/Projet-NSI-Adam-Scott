@@ -13,7 +13,7 @@ Le nombre de points est calculé en fonction du nombre de tuyaux évités.
 
 
 
-### Cahier des charges : 
+### 📊 Cahier des charges 📊: 
 - créé avec Pygame
 - système de highscore sauvegardé dans des fichiers en fonction du nombre de vie et du mode : niveau ou infini
 
