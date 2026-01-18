@@ -8,9 +8,13 @@ pygame.display.set_caption("Flappy Bird NSI")
 
 background = pygame.image.load("images/background.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+background_menu = pygame.image.load("images/background_menu.png").convert()
+background_menu = pygame.transform.scale(background_menu, (WIDTH, HEIGHT))
+gameover_background = pygame.image.load("images/gameover_background.png").convert()
+gameover_background = pygame.transform.scale(gameover_background, (WIDTH, HEIGHT))
 start_button = pygame.image.load("images/start_button.png").convert_alpha()
 start_button = pygame.transform.scale(start_button, (200, 200))
-start_rect = start_button.get_rect(center=(150, 320))
+start_rect = start_button.get_rect(center=(400, 370))
 # start_rect.inflate_ip(-40, -40)
 button_rect = start_button.get_rect()
 button_rect.size = (200, 74)
@@ -32,13 +36,27 @@ while running:
                 if button_rect.collidepoint(event.pos):
                     game_state = "game"
 
+        if game_state == "game":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w: 
+                    game_state = "gameover"
+        
+        if game_state == "gameover":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m: 
+                    game_state = "menu"
+    
     if game_state == "menu":
-        screen.blit(background, (0, 0))
+        screen.blit(background_menu, (0, 0))
         screen.blit(start_button, start_rect)
         # pygame.draw.rect(screen, (0,0,0), button_rect, 2)
+    
 
     elif game_state == "game":
-        screen.fill((135, 206, 235)) 
+         screen.blit(background, (0, 0)) 
+
+    elif game_state == "gameover":
+        screen.blit(gameover_background, (0, 0))
     pygame.display.flip()
 
 pygame.quit()
