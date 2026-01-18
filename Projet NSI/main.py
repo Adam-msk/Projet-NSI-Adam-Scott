@@ -1,18 +1,22 @@
 import pygame
 from settings import*
+import os
 
 pygame.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flappy Bird NSI")
 
-background = pygame.image.load("images/background.png").convert()
+curdir = os.path.dirname(os.path.abspath(__file__))
+
+
+background = pygame.image.load(f"{curdir}/images/background.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
-background_menu = pygame.image.load("images/background_menu.png").convert()
+background_menu = pygame.image.load(f"{curdir}/images/background_menu.png").convert()
 background_menu = pygame.transform.scale(background_menu, (WIDTH, HEIGHT))
-gameover_background = pygame.image.load("images/gameover_background.png").convert()
+gameover_background = pygame.image.load(f"{curdir}/images/gameover_background.png").convert()
 gameover_background = pygame.transform.scale(gameover_background, (WIDTH, HEIGHT))
-start_button = pygame.image.load("images/start_button.png").convert_alpha()
+start_button = pygame.image.load(f"{curdir}/images/start_button.png").convert_alpha()
 start_button = pygame.transform.scale(start_button, (200, 200))
 start_rect = start_button.get_rect(center=(400, 370))
 # start_rect.inflate_ip(-40, -40)
