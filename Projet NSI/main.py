@@ -1,3 +1,9 @@
+"""
+Flappy Bird Game - NSI Project
+A simple Flappy Bird game implementation using Pygame.
+This module handles the main game loop and state management (menu, game, gameover).
+"""
+
 import pygame
 from settings import*
 import os
@@ -28,6 +34,12 @@ clock = pygame.time.Clock()
 running = True
 game_state = "menu"
 
+# Load sound effects
+try:
+    start_sound = pygame.mixer.Sound(f"{curdir}/sound_effects/start_sound.wav")
+except:
+    start_sound = None
+
 while running:
     clock.tick(FPS)
 
@@ -38,6 +50,8 @@ while running:
         if game_state == "menu":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_rect.collidepoint(event.pos):
+                    if start_sound:
+                        start_sound.play()
                     game_state = "game"
 
         if game_state == "game":
