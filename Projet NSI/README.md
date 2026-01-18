@@ -43,4 +43,6 @@ Le nombre de points est calculé en fonction du nombre de tuyaux évités.
 
  
 Touche W and le jeu pour basculer sur l'ecran game over
+
+
 Touche M dans l'ecran game over pour retourner au menu
