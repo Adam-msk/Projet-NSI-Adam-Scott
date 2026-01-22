@@ -16,6 +16,11 @@ background_menu = pygame.image.load(f"{curdir}/images/background_menu.png").conv
 background_menu = pygame.transform.scale(background_menu, (WIDTH, HEIGHT))
 gameover_background = pygame.image.load(f"{curdir}/images/gameover_background.png").convert()
 gameover_background = pygame.transform.scale(gameover_background, (WIDTH, HEIGHT))
+menu_button =  pygame.image.load(f"{curdir}/images/button_menu.png").convert_alpha()
+menu_button = pygame.transform.scale(menu_button, (260, 200))
+menu_rect = menu_button.get_rect(center=(400, 370))  
+menu_rect.size = (200, 200)
+menu_rect.center = (menu_rect.centerx, menu_rect.centery)
 start_button = pygame.image.load(f"{curdir}/images/start_button.png").convert_alpha()
 start_button = pygame.transform.scale(start_button, (200, 200))
 start_rect = start_button.get_rect(center=(400, 370))
@@ -47,8 +52,13 @@ while running:
         
         if game_state == "gameover":
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_m: 
+                if event.key == pygame.K_m:
                     game_state = "menu"
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if menu_rect.collidepoint(event.pos):
+                    game_state = "menu"
+
     
     if game_state == "menu":
         screen.blit(background_menu, (0, 0))
@@ -57,10 +67,12 @@ while running:
     
 
     elif game_state == "game":
-         screen.blit(background, (0, 0)) 
+        screen.blit(background, (0, 0)) 
 
     elif game_state == "gameover":
         screen.blit(gameover_background, (0, 0))
+        screen.blit(menu_button, menu_rect)
+        pygame.draw.rect(screen, (255, 0, 0), menu_rect, 2)
     pygame.display.flip()
 
 pygame.quit()
