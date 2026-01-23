@@ -1,15 +1,21 @@
+"""
+Flappy Bird Game - NSI Project
+A simple Flappy Bird game implementation using Pygame.
+This module handles the main game loop and state management (menu, game, gameover).
+"""
+
 import pygame
 from settings import*
 import os
 
 pygame.init()
-
+pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flappy Bird NSI")
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 
-
+MENU_MUSIC = f"{curdir}/sound_effects/menu_music.mp3"
 background = pygame.image.load(f"{curdir}/images/background.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 background_menu = pygame.image.load(f"{curdir}/images/background_menu.png").convert()
@@ -27,9 +33,20 @@ button_rect.center = (start_rect.centerx, start_rect.centery)
 clock = pygame.time.Clock()
 running = True
 game_state = "menu"
+menu_music_playing = False
+# Load sound effects
+try:
+    start_sound = pygame.mixer.Sound(f"{curdir}/sound_effects/start_sound.mp3")
+except:
+    start_sound = None
 
 while running:
     clock.tick(FPS)
+    if game_state == "menu" and not menu_music_playing:
+        pygame.mixer.music.load(MENU_MUSIC)
+        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.play(-1)  # boucle infinie
+        menu_music_playing = True
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -38,6 +55,10 @@ while running:
         if game_state == "menu":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button_rect.collidepoint(event.pos):
+                    if start_sound:
+                        start_sound.play()
+                    pygame.mixer.music.stop()
+                    menu_music_playing = False
                     game_state = "game"
 
         if game_state == "game":
