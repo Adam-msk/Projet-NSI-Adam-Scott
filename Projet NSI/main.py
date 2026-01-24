@@ -12,7 +12,7 @@ pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flappy Bird NSI")
-
+clock = pygame.time.Clock()
 curdir = os.path.dirname(os.path.abspath(__file__))
 
 MENU_MUSIC = f"{curdir}/sound_effects/menu_music.mp3"
@@ -30,15 +30,44 @@ button_rect = start_button.get_rect()
 button_rect.size = (200, 74)
 button_rect.center = (start_rect.centerx, start_rect.centery)
 
-clock = pygame.time.Clock()
-running = True
-game_state = "menu"
-menu_music_playing = False
 # Load sound effects
 try:
     start_sound = pygame.mixer.Sound(f"{curdir}/sound_effects/start_sound.mp3")
 except:
     start_sound = None
+
+class Bird:
+    def __init__(self):   
+        self.image_up = pygame.image.load(f"{curdir}/images/bird_wing_up.png").convert_alpha()
+        self.image_down = pygame.image.load(f"{curdir}/images/bird_wing_down.png").convert_alpha()
+        self.image_up = pygame.transform.scale(self.image_up, (50, 35))
+        self.image_down = pygame.transform.scale(self.image_down, (50, 35))
+        self.image = self.image_up
+        self.rect = self.image.get_rect(center=(150, HEIGHT // 2))
+
+
+        self.velocity = 0
+        self.gravity = 0.5
+        self.jump_strength = -8
+
+    def jump(self):
+        self.velocity = self.jump_strength
+        if self.image == self.image_up:
+            self.image = self.image_down
+        else:
+            self.image = self.image_up
+
+    def update(self):
+        self.velocity += self.gravity
+        self.rect.y += self.velocity
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
+running = True
+game_state = "menu"
+menu_music_playing = False
+bird = Bird()
 
 while running:
     clock.tick(FPS)
@@ -59,13 +88,14 @@ while running:
                         start_sound.play()
                     pygame.mixer.music.stop()
                     menu_music_playing = False
+                    bird = Bird()  # Reset bird position
                     game_state = "game"
 
         if game_state == "game":
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w: 
-                    game_state = "gameover"
-        
+                if event.key == pygame.K_SPACE: 
+                    bird.jump()
+
         if game_state == "gameover":
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m: 
@@ -78,7 +108,12 @@ while running:
     
 
     elif game_state == "game":
-         screen.blit(background, (0, 0)) 
+        screen.blit(background, (0, 0)) 
+        bird.update()
+        bird.draw(screen)
+
+        if bird.rect.top <= 0 or bird.rect.bottom >= HEIGHT:
+            game_state = "gameover"
 
     elif game_state == "gameover":
         screen.blit(gameover_background, (0, 0))
