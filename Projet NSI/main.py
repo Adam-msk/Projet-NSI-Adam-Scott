@@ -6,17 +6,20 @@ This module handles the main game loop and state management (menu, game, gameove
 
 import pygame
 from settings import*
+from player import Bird
 import os
 
+# Initialize Pygame and create the game window
 pygame.init()
-pygame.mixer.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Flappy Bird NSI")
-clock = pygame.time.Clock()
-curdir = os.path.dirname(os.path.abspath(__file__))
+pygame.mixer.init()  # Initialize the mixer for sound effects
+screen = pygame.display.set_mode((WIDTH, HEIGHT))  # Set the dimensions of the game window
+pygame.display.set_caption("Flappy Bird NSI")  # Set the title of the game window
+clock = pygame.time.Clock()  # Create a clock object to manage the frame rate
+curdir = os.path.dirname(os.path.abspath(__file__))  # Get the current directory path
 
-MENU_MUSIC = f"{curdir}/sound_effects/menu_music.mp3"
-background = pygame.image.load(f"{curdir}/images/background.png").convert()
+# Load music and background image
+MENU_MUSIC = f"{curdir}/sound_effects/menu_music.mp3"  # Path to the menu music
+background = pygame.image.load(f"{curdir}/images/background.png").convert()  # Load and convert the background image
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 background_menu = pygame.image.load(f"{curdir}/images/background_menu.png").convert()
 background_menu = pygame.transform.scale(background_menu, (WIDTH, HEIGHT))
@@ -36,45 +39,18 @@ try:
 except:
     start_sound = None
 
-class Bird:
-    def __init__(self):   
-        self.image_up = pygame.image.load(f"{curdir}/images/bird_wing_up.png").convert_alpha()
-        self.image_down = pygame.image.load(f"{curdir}/images/bird_wing_down.png").convert_alpha()
-        self.image_up = pygame.transform.scale(self.image_up, (50, 35))
-        self.image_down = pygame.transform.scale(self.image_down, (50, 35))
-        self.image = self.image_up
-        self.rect = self.image.get_rect(center=(150, HEIGHT // 2))
-
-
-        self.velocity = 0
-        self.gravity = 0.5
-        self.jump_strength = -8
-
-    def jump(self):
-        self.velocity = self.jump_strength
-        if self.image == self.image_up:
-            self.image = self.image_down
-        else:
-            self.image = self.image_up
-
-    def update(self):
-        self.velocity += self.gravity
-        self.rect.y += self.velocity
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-
+bird = Bird()
 running = True
 game_state = "menu"
 menu_music_playing = False
-bird = Bird()
+
 
 while running:
     clock.tick(FPS)
     if game_state == "menu" and not menu_music_playing:
         pygame.mixer.music.load(MENU_MUSIC)
         pygame.mixer.music.set_volume(0.2)
-        pygame.mixer.music.play(-1)  # boucle infinie
+        pygame.mixer.music.play(-1)  # infinite loop
         menu_music_playing = True
 
     for event in pygame.event.get():
