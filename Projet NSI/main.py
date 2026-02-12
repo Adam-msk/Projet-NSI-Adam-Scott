@@ -9,8 +9,6 @@ from settings import*
 from Bird import Bird
 import os
 
-#ceci est un test
-
 # Initialize Pygame and create the game window
 pygame.init()
 pygame.mixer.init()
