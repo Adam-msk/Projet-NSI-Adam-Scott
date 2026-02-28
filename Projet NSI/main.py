@@ -45,9 +45,16 @@ try:
 except:
     start_sound = None
 
+try:
+    score_sound = pygame.mixer.Sound(f"{curdir}/sound_effects/score_sound.mp3")
+except:
+    score_sound = None
+
 
 bird = Bird() # Create the Bird
 pipes = [] # List to hold the pipes
+score = 0
+font = pygame.font.Font(None, 50)
 SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE, 1500) # Spawn a new pipe every 1.5 seconds
 bg_x = 0 # Background x position for scrolling effect
@@ -81,6 +88,7 @@ while running:
                     bird = Bird()  # Reset bird position
                     bg_x = 0 # Reset background position
                     pipes = [] # Clear existing pipes
+                    score = 0 # Reset score
                     game_state = "game"
 
         if game_state == "game":
@@ -109,7 +117,7 @@ while running:
         bg_x -= scroll_speed
         screen.blit(background, (bg_x, 0))
         screen.blit(background, (bg_x + WIDTH, 0))
-        if bg_x <= -WIDTH:
+        if bg_x <= -WIDTH: 
             bg_x = 0
         bird.update()
         bird.draw(screen)
@@ -118,7 +126,16 @@ while running:
         for pipe in pipes:
             pipe.update()
             pipe.draw(screen)
-            pipes = [pipe for pipe in pipes if not pipe.off_screen()] # Remove pipes that have moved off screen 
+            score_text = font.render(str(score), True, (255, 255, 255))
+            screen.blit(score_text, (WIDTH // 2, 50))
+            # Check if the bird has passed the pipe to update the score
+            if not pipe.passed and pipe.x < bird.rect.x:
+                pipe.passed = True
+                score += 1
+                if score_sound:
+                    score_sound.set_volume(0.2)
+                    score_sound.play()
+        pipes = [pipe for pipe in pipes if not pipe.off_screen()] # Remove pipes that have moved off screen 
         
         for pipe in pipes:
             if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect): 
