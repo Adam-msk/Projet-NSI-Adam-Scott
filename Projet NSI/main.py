@@ -27,9 +27,9 @@ background_menu = pygame.transform.scale(background_menu, (WIDTH, HEIGHT))
 gameover_background = pygame.image.load(f"{curdir}/images/gameover_background.png").convert()
 gameover_background = pygame.transform.scale(gameover_background, (WIDTH, HEIGHT))
 start_button = pygame.image.load(f"{curdir}/images/start_button.png").convert_alpha()
-start_button = pygame.transform.scale(start_button, (200, 200))
+start_button = pygame.transform.scale(start_button, (200 , 200))
 restart_button = pygame.image.load(f"{curdir}/images/restart_button.png").convert_alpha()
-restart_button = pygame.transform.scale(restart_button, (200, 200))
+restart_button = pygame.transform.scale(restart_button, (350, 300))
 restart_rect = restart_button.get_rect(center=(400, 370))
 start_rect = start_button.get_rect(center=(400, 370))
 button_rect = start_button.get_rect()
@@ -54,6 +54,7 @@ except:
 bird = Bird() # Create the Bird
 pipes = [] # List to hold the pipes
 score = 0
+best_score = 0
 font = pygame.font.Font(None, 50)
 SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE, 1500) # Spawn a new pipe every 1.5 seconds
@@ -138,16 +139,24 @@ while running:
         pipes = [pipe for pipe in pipes if not pipe.off_screen()] # Remove pipes that have moved off screen 
         
         for pipe in pipes:
-            if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect): 
+            if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect):
+                if score > best_score:
+                    best_score = score
                 game_state = "gameover"
 
         #Check if the bird has hit the top or bottom of the screen
         if bird.rect.top <= 0 or bird.rect.bottom >= HEIGHT:
+            if score > best_score:
+                best_score = score
             game_state = "gameover"
 
     elif game_state == "gameover":
+        best_score_text = font.render(f"Best Score: {best_score}", True, (255,255,255))
+        score_text = font.render(f"Score: {score}", True, (255,255,255))
         screen.blit(gameover_background, (0, 0))
-        # screen.blit(restart_button, restart_rect) # Uncomment to show the restart button, in need of a better restart button image
+        screen.blit(best_score_text, (WIDTH//2 - 110, 200))
+        screen.blit(score_text, (WIDTH//2 - 110, 250))
+        screen.blit(restart_button, restart_rect) # Uncomment to show the restart button, in need of a better restart button image
     pygame.display.flip()
 
 pygame.quit()
