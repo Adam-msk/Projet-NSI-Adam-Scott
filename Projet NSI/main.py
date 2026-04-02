@@ -5,6 +5,7 @@ This module handles the main game loop and state management (menu, game, gameove
 """
 
 import pygame
+import math
 from settings import*
 from Bird import Bird
 from Pipe import Pipe   
@@ -63,6 +64,11 @@ scroll_speed = 2 # Speed at which the background scrolls
 running = True
 game_state = "menu"
 menu_music_playing = False
+game_started = False
+start_time = 0
+base_y = HEIGHT // 2
+countdown = 3
+countdown_start = 0
 
 # Main game loop
 while running:
@@ -87,16 +93,21 @@ while running:
                     pygame.mixer.music.stop()
                     menu_music_playing = False
                     bird = Bird()  # Reset bird position
+                    base_y = HEIGHT // 2 # Reset base y position for floating effect
                     bg_x = 0 # Reset background position
                     pipes = [] # Clear existing pipes
                     score = 0 # Reset score
+                    game_started = False
+                    start_time = pygame.time.get_ticks()
+                    countdown = 3
+                    countdown_start = pygame.time.get_ticks()
                     game_state = "game"
 
         if game_state == "game":
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE: 
+                if event.key == pygame.K_SPACE and game_started: 
                     bird.jump()
-            if event.type == SPAWNPIPE:
+            if event.type == SPAWNPIPE and game_started:
                 pipes.append(Pipe(WIDTH)) # Spawn a new pipe at the right edge of the screen
 
         # Handle game over state and return to menu
@@ -120,7 +131,19 @@ while running:
         screen.blit(background, (bg_x + WIDTH, 0))
         if bg_x <= -WIDTH: 
             bg_x = 0
-        bird.update()
+        if not game_started:
+            text = font.render(str(countdown), True, (255,255,255))
+            screen.blit(text, (WIDTH//2 - 10, HEIGHT//2 - 50))
+            current_time = pygame.time.get_ticks()
+            if current_time - countdown_start >= 1000: # Update countdown every second
+                countdown -= 1
+                countdown_start = current_time
+            if countdown <= 0:
+                game_started = True
+            # effet flottant
+            bird.rect.y = base_y + int(10 * math.sin(pygame.time.get_ticks() / 300))
+        else:
+            bird.update()
         bird.draw(screen)
 
         ############# Update and draw pipes, and check for collisions with the bird #############
