@@ -58,7 +58,7 @@ score = 0
 best_score = 0
 font = pygame.font.Font(None, 50)
 SPAWNPIPE = pygame.USEREVENT
-pygame.time.set_timer(SPAWNPIPE, 1500) # Spawn a new pipe every 1.5 seconds
+pygame.time.set_timer(SPAWNPIPE, 1500) # Spawn a new pipe every 1.5  seconds
 bg_x = 0 # Background x position for scrolling effect
 scroll_speed = 2 # Speed at which the background scrolls
 running = True
@@ -66,10 +66,11 @@ game_state = "menu"
 menu_music_playing = False
 game_started = False
 start_time = 0
-base_y = HEIGHT // 2
+base_y = HEIGHT // 2 # Base y position for the bird's floating effect in the menu
 countdown = 3
 countdown_start = 0
-
+current_gap = 250 # Initial gap size between pipes
+last_spawn_delay = 1500 # Initial spawn delay for pipes in milliseconds
 # Main game loop
 while running:
     clock.tick(FPS)
@@ -97,6 +98,8 @@ while running:
                     bg_x = 0 # Reset background position
                     pipes = [] # Clear existing pipes
                     score = 0 # Reset score
+                    last_spawn_delay = 1500 # Reset spawn delay for pipes
+                    pygame.time.set_timer(SPAWNPIPE, last_spawn_delay) # Reset the pipe spawn timer
                     game_started = False
                     start_time = pygame.time.get_ticks()
                     countdown = 3
@@ -108,7 +111,7 @@ while running:
                 if event.key == pygame.K_SPACE and game_started: 
                     bird.jump()
             if event.type == SPAWNPIPE and game_started:
-                pipes.append(Pipe(WIDTH)) # Spawn a new pipe at the right edge of the screen
+                pipes.append(Pipe(WIDTH, current_gap, scroll_speed)) # Spawn a new pipe at the right edge of the screen
 
         # Handle game over state and return to menu
         if game_state == "gameover":
@@ -126,13 +129,16 @@ while running:
 
     elif game_state == "game":
         # Scroll the background to create a moving effect
+        scroll_speed = min(5, 2 + score * 0.05) # Increase scroll speed as score increases, with a maximum speed of 5
+        spawn_delay = max(700, 1500 - score * 20) # Decrease spawn delay as score increases, with a minimum delay of 1200 ms
+        current_gap = max(160, 250 - score * 3) # Decrease the gap size as the score increases, with a minimum gap of 160 
         bg_x -= scroll_speed
         screen.blit(background, (bg_x, 0))
         screen.blit(background, (bg_x + WIDTH, 0))
         if bg_x <= -WIDTH: 
             bg_x = 0
         if not game_started:
-            text = font.render(str(countdown), True, (255,255,255))
+            text = font.render(str(countdown), True, (255,255,255)) # Render the countdown text
             screen.blit(text, (WIDTH//2 - 10, HEIGHT//2 - 50))
             current_time = pygame.time.get_ticks()
             if current_time - countdown_start >= 1000: # Update countdown every second
@@ -140,15 +146,18 @@ while running:
                 countdown_start = current_time
             if countdown <= 0:
                 game_started = True
-            # effet flottant
-            bird.rect.y = base_y + int(10 * math.sin(pygame.time.get_ticks() / 300))
+                if spawn_delay != last_spawn_delay: # Check if the spawn delay has changed due to score increase
+                    pygame.time.set_timer(SPAWNPIPE, spawn_delay) # Update the pipe spawn timer
+                    last_spawn_delay = spawn_delay # Update the last spawn delay to the current spawn delay
+            bird.rect.y = base_y + int(10 * math.sin(pygame.time.get_ticks() / 300)) # Make the bird float up and down in the menu
         else:
             bird.update()
         bird.draw(screen)
 
         ############# Update and draw pipes, and check for collisions with the bird #############
         for pipe in pipes:
-            pipe.update()
+            pipe. speed = scroll_speed
+            pipe.update() # Move pipes only if the game has started 
             pipe.draw(screen)
             score_text = font.render(str(score), True, (255, 255, 255))
             screen.blit(score_text, (WIDTH // 2, 50))
@@ -162,7 +171,7 @@ while running:
         pipes = [pipe for pipe in pipes if not pipe.off_screen()] # Remove pipes that have moved off screen 
         
         for pipe in pipes:
-            if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect):
+            if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect): # Check for collision with pipes
                 if score > best_score:
                     best_score = score
                 game_state = "gameover"
@@ -179,7 +188,7 @@ while running:
         screen.blit(gameover_background, (0, 0))
         screen.blit(best_score_text, (WIDTH//2 - 110, 200))
         screen.blit(score_text, (WIDTH//2 - 110, 250))
-        screen.blit(restart_button, restart_rect) # Uncomment to show the restart button, in need of a better restart button image
+        screen.blit(restart_button, restart_rect)
     pygame.display.flip()
 
 pygame.quit()
