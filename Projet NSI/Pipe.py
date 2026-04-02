@@ -25,6 +25,7 @@ class Pipe:
 
         self.top_img = pygame.transform.flip(PIPE_IMG, False, True)  # Flip the pipe image for the top pipe
         self.bottom_img = PIPE_IMG
+        self.passed = False
 
     def update(self):
         self.x -= self.speed
