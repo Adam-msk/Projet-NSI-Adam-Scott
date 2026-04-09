@@ -10,6 +10,7 @@ from settings import*
 from Bird import Bird
 from Pipe import Pipe   
 import os
+import random
 
 # Initialize Pygame and create the game window
 pygame.init()
@@ -39,6 +40,14 @@ button_rect.center = (start_rect.centerx, start_rect.centery)
 button_rect2 = restart_button.get_rect()
 button_rect2.size = (200, 74)
 button_rect2.center = (restart_rect.centerx, restart_rect.centery)
+special_background = pygame.image.load(f"{curdir}/images/special.png").convert()
+special_background = pygame.transform.scale(special_background, (WIDTH, HEIGHT))
+special_event = False
+special_event_timer = 0
+SPECIAL_EVENT_DURATION = 5000
+invincible = False
+invincible_timer = 0
+INVINCIBILITY_DURATION = 3000
 
 # Load sound effects
 try:
@@ -102,6 +111,12 @@ while running:
                     countdown = 3
                     countdown_start = pygame.time.get_ticks()
                     game_state = "game"
+                    bg_x = 0
+                    special_event = False
+                    special_event_timer = 0
+                    invincible = False
+                    invincible_timer = 0
+
 
         if game_state == "game":
             if event.type == pygame.KEYDOWN:
@@ -109,7 +124,10 @@ while running:
                     bird.jump()
             if event.type == SPAWNPIPE and game_started:
                 pipes.append(Pipe(WIDTH)) # Spawn a new pipe at the right edge of the screen
-
+                if not special_event and random.randint(1, 20) == 1:  # 1% de chance
+                    special_event = True
+                    special_event_timer = pygame.time.get_ticks()
+        
         # Handle game over state and return to menu
         if game_state == "gameover":
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -125,12 +143,21 @@ while running:
     
 
     elif game_state == "game":
-        # Scroll the background to create a moving effect
         bg_x -= scroll_speed
-        screen.blit(background, (bg_x, 0))
-        screen.blit(background, (bg_x + WIDTH, 0))
-        if bg_x <= -WIDTH: 
-            bg_x = 0
+        if bg_x <= -WIDTH:
+            bg_x = 0        # Scroll the background to create a moving effect
+        if special_event:
+            screen.blit(special_background, (bg_x, 0))
+            screen.blit(special_background, (bg_x + WIDTH, 0))
+            if pygame.time.get_ticks() - special_event_timer > SPECIAL_EVENT_DURATION:
+                special_event = False  # L'event se termine après 5 secondes
+                invincible = True  # démarre l'invincibilité
+                invincible_timer = pygame.time.get_ticks()                
+        else:
+            screen.blit(background, (bg_x, 0))
+            screen.blit(background, (bg_x + WIDTH, 0))
+        if invincible and pygame.time.get_ticks() - invincible_timer > INVINCIBILITY_DURATION:
+            invincible = False
         if not game_started:
             text = font.render(str(countdown), True, (255,255,255))
             screen.blit(text, (WIDTH//2 - 10, HEIGHT//2 - 50))
@@ -144,12 +171,15 @@ while running:
             bird.rect.y = base_y + int(10 * math.sin(pygame.time.get_ticks() / 300))
         else:
             bird.update()
-        bird.draw(screen)
-
+        if invincible:
+            if (pygame.time.get_ticks() // 100) % 2 == 0:  # clignote toutes les 200ms
+                bird.draw(screen)
+        else:
+            bird.draw(screen)
         ############# Update and draw pipes, and check for collisions with the bird #############
         for pipe in pipes:
             pipe.update()
-            pipe.draw(screen)
+            pipe.draw(screen, hidden=special_event)
             score_text = font.render(str(score), True, (255, 255, 255))
             screen.blit(score_text, (WIDTH // 2, 50))
             # Check if the bird has passed the pipe to update the score
@@ -161,11 +191,12 @@ while running:
                     score_sound.play()
         pipes = [pipe for pipe in pipes if not pipe.off_screen()] # Remove pipes that have moved off screen 
         
-        for pipe in pipes:
-            if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect):
-                if score > best_score:
-                    best_score = score
-                game_state = "gameover"
+        if not special_event and not invincible:
+            for pipe in pipes:
+                if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect):
+                    if score > best_score:
+                        best_score = score
+                    game_state = "gameover"
 
         #Check if the bird has hit the top or bottom of the screen
         if bird.rect.top <= 0 or bird.rect.bottom >= HEIGHT:
