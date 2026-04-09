@@ -57,8 +57,6 @@ pipes = [] # List to hold the pipes
 score = 0
 best_score = 0
 font = pygame.font.Font(None, 50)
-SPAWNPIPE = pygame.USEREVENT
-pygame.time.set_timer(SPAWNPIPE, 1500) # Spawn a new pipe every 1.5  seconds
 bg_x = 0 # Background x position for scrolling effect
 scroll_speed = 2 # Speed at which the background scrolls
 running = True
@@ -70,7 +68,8 @@ base_y = HEIGHT // 2 # Base y position for the bird's floating effect in the men
 countdown = 3
 countdown_start = 0
 current_gap = 250 # Initial gap size between pipes
-last_spawn_delay = 1500 # Initial spawn delay for pipes in milliseconds
+distance_since_last_pipe = 0
+pipe_spacing = 250  # distance between pipes
 # Main game loop
 while running:
     clock.tick(FPS)
@@ -98,20 +97,17 @@ while running:
                     bg_x = 0 # Reset background position
                     pipes = [] # Clear existing pipes
                     score = 0 # Reset score
-                    last_spawn_delay = 1500 # Reset spawn delay for pipes
-                    pygame.time.set_timer(SPAWNPIPE, last_spawn_delay) # Reset the pipe spawn timer
                     game_started = False
                     start_time = pygame.time.get_ticks()
                     countdown = 3
                     countdown_start = pygame.time.get_ticks()
+                    distance_since_last_pipe = 0
                     game_state = "game"
 
         if game_state == "game":
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and game_started: 
+                if event.key == pygame.K_SPACE and game_started:
                     bird.jump()
-            if event.type == SPAWNPIPE and game_started:
-                pipes.append(Pipe(WIDTH, current_gap, scroll_speed)) # Spawn a new pipe at the right edge of the screen
 
         # Handle game over state and return to menu
         if game_state == "gameover":
@@ -129,9 +125,13 @@ while running:
 
     elif game_state == "game":
         # Scroll the background to create a moving effect
-        scroll_speed = min(5, 2 + score * 0.05) # Increase scroll speed as score increases, with a maximum speed of 5
-        spawn_delay = max(700, 1500 - score * 20) # Decrease spawn delay as score increases, with a minimum delay of 1200 ms
-        current_gap = max(160, 250 - score * 3) # Decrease the gap size as the score increases, with a minimum gap of 160 
+        scroll_speed = min(5, 2 + score * 0.04) # Increase scroll speed as score increases, with a maximum speed of 5
+        pipe_spacing = max(170, 250 - score * 2) # Deacrease the distance between pipes as the score increase
+        distance_since_last_pipe += scroll_speed
+        if game_started and distance_since_last_pipe >= pipe_spacing:
+            pipes.append(Pipe(WIDTH, current_gap, scroll_speed))
+            distance_since_last_pipe = 0
+        current_gap = max(160, 250 - score * 4) # Decrease the gap size as the score increases, with a minimum gap of 160 
         bg_x -= scroll_speed
         screen.blit(background, (bg_x, 0))
         screen.blit(background, (bg_x + WIDTH, 0))
@@ -146,9 +146,6 @@ while running:
                 countdown_start = current_time
             if countdown <= 0:
                 game_started = True
-                if spawn_delay != last_spawn_delay: # Check if the spawn delay has changed due to score increase
-                    pygame.time.set_timer(SPAWNPIPE, spawn_delay) # Update the pipe spawn timer
-                    last_spawn_delay = spawn_delay # Update the last spawn delay to the current spawn delay
             bird.rect.y = base_y + int(10 * math.sin(pygame.time.get_ticks() / 300)) # Make the bird float up and down in the menu
         else:
             bird.update()
@@ -156,7 +153,7 @@ while running:
 
         ############# Update and draw pipes, and check for collisions with the bird #############
         for pipe in pipes:
-            pipe. speed = scroll_speed
+            pipe.speed = scroll_speed
             pipe.update() # Move pipes only if the game has started 
             pipe.draw(screen)
             score_text = font.render(str(score), True, (255, 255, 255))
