@@ -124,7 +124,7 @@ while running:
                     bird.jump()
             if event.type == SPAWNPIPE and game_started:
                 pipes.append(Pipe(WIDTH)) # Spawn a new pipe at the right edge of the screen
-                if not special_event and random.randint(1, 20) == 1:  # 1% de chance
+                if not special_event and random.randint(1, 20) == 1:  # 5% de chance
                     special_event = True
                     special_event_timer = pygame.time.get_ticks()
         
