@@ -32,9 +32,10 @@ class Pipe:
         self.top_rect.x = self.x
         self.bottom_rect.x = self.x
 
-    def draw(self, screen):
-        screen.blit(self.top_img, (self.top_rect.x, self.top_rect.bottom - self.top_img.get_height())) #Draw the top pipe
-        screen.blit(self.bottom_img, (self.bottom_rect.x, self.bottom_rect.y)) #Draw the bottom pipe
+    def draw(self, screen, hidden = False):
+        if not hidden:
+            screen.blit(self.top_img, (self.top_rect.x, self.top_rect.bottom - self.top_img.get_height())) #Draw the top pipe
+            screen.blit(self.bottom_img, (self.bottom_rect.x, self.bottom_rect.y)) #Draw the bottom pipe
 
     def off_screen(self):
         return self.x < -80
