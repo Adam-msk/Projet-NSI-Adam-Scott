@@ -4,13 +4,15 @@ A simple Flappy Bird game implementation using Pygame.
 This module handles the main game loop and state management (menu, game, gameover).
 """
 
+
 import pygame
 import math
 from settings import*
 from Bird import Bird
 from Pipe import Pipe   
 import os
-
+import random 
+ 
 # Initialize Pygame and create the game window
 pygame.init()
 pygame.mixer.init()
@@ -31,6 +33,8 @@ start_button = pygame.image.load(f"{curdir}/images/start_button.png").convert_al
 start_button = pygame.transform.scale(start_button, (200 , 200))
 restart_button = pygame.image.load(f"{curdir}/images/restart_button.png").convert_alpha()
 restart_button = pygame.transform.scale(restart_button, (350, 300))
+special_background = pygame.image.load(f"{curdir}/images/special.png").convert()
+special_background = pygame.transform.scale(special_background, (WIDTH, HEIGHT))
 restart_rect = restart_button.get_rect(center=(400, 370))
 start_rect = start_button.get_rect(center=(400, 370))
 button_rect = start_button.get_rect()
@@ -70,6 +74,13 @@ countdown_start = 0
 current_gap = 250 # Initial gap size between pipes
 distance_since_last_pipe = 0
 pipe_spacing = 250  # distance between pipes
+special_event = False # Flag to indicate if the special event is active
+special_event_timer = 0
+SPECIAL_EVENT_DURATION = 5000 # Duration of the special event in milliseconds
+invincible = False # Flag to indicate if the bird is currently invincible
+invincible_timer = 0
+INVINCIBILITY_DURATION = 3000 # Duration of invincibility in milliseconds
+special_event_triggered = False # Flag to ensure the special event is triggered only once per game
 # Main game loop
 while running:
     clock.tick(FPS)
@@ -103,6 +114,10 @@ while running:
                     countdown_start = pygame.time.get_ticks()
                     distance_since_last_pipe = 0
                     game_state = "game"
+                    special_event = False
+                    special_event_timer = 0
+                    invincible = False
+                    invincible_timer = 0
 
         if game_state == "game":
             if event.type == pygame.KEYDOWN:
@@ -131,12 +146,29 @@ while running:
         if game_started and distance_since_last_pipe >= pipe_spacing:
             pipes.append(Pipe(WIDTH, current_gap, scroll_speed))
             distance_since_last_pipe = 0
-        current_gap = max(160, 250 - score * 4) # Decrease the gap size as the score increases, with a minimum gap of 160 
+            # if not special_event and not special_event_triggered and random.randint(1, 20) == 1:  # 5% odds to trigger the special event when a new pipe is generated
+                # special_event = True
+                # special_event_timer = pygame.time.get_ticks()
+                # special_event_triggered = True
+        current_gap = max(160, 250 - score * 5) # Decrease the gap size as the score increases, with a minimum gap of 160 
         bg_x -= scroll_speed
-        screen.blit(background, (bg_x, 0))
-        screen.blit(background, (bg_x + WIDTH, 0))
+        if special_event:
+            screen.blit(special_background, (bg_x, 0))
+            screen.blit(special_background, (bg_x + WIDTH, 0))
+            if pygame.time.get_ticks() - special_event_timer > SPECIAL_EVENT_DURATION:
+                special_event = False  # L'event se termine après 5 secondes
+                invincible = True  # démarre l'invincibilité
+                invincible_timer = pygame.time.get_ticks()   
+        else:
+            screen.blit(background, (bg_x, 0))
+            screen.blit(background, (bg_x + WIDTH, 0))
+
         if bg_x <= -WIDTH: 
             bg_x = 0
+        
+        if invincible and pygame.time.get_ticks() - invincible_timer > INVINCIBILITY_DURATION:
+            invincible = False
+
         if not game_started:
             text = font.render(str(countdown), True, (255,255,255)) # Render the countdown text
             screen.blit(text, (WIDTH//2 - 10, HEIGHT//2 - 50))
@@ -149,15 +181,19 @@ while running:
             bird.rect.y = base_y + int(10 * math.sin(pygame.time.get_ticks() / 300)) # Make the bird float up and down in the menu
         else:
             bird.update()
-        bird.draw(screen)
+            
+        if invincible:
+            if (pygame.time.get_ticks() // 100) % 2 == 0:  # bird flashing every 200ms when invincible
+                bird.draw(screen)
+        else:
+            bird.draw(screen)
 
         ############# Update and draw pipes, and check for collisions with the bird #############
         for pipe in pipes:
             pipe.speed = scroll_speed
             pipe.update() # Move pipes only if the game has started 
-            pipe.draw(screen)
-            score_text = font.render(str(score), True, (255, 255, 255))
-            screen.blit(score_text, (WIDTH // 2, 50))
+            if not special_event:
+                pipe.draw(screen) # Hide pipes during the special event
             # Check if the bird has passed the pipe to update the score
             if not pipe.passed and pipe.x < bird.rect.x:
                 pipe.passed = True
@@ -165,13 +201,16 @@ while running:
                 if score_sound:
                     score_sound.set_volume(0.2)
                     score_sound.play()
+        score_text = font.render(str(score), True, (255, 255, 255))
+        screen.blit(score_text, (WIDTH // 2, 50))
         pipes = [pipe for pipe in pipes if not pipe.off_screen()] # Remove pipes that have moved off screen 
         
-        for pipe in pipes:
-            if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect): # Check for collision with pipes
-                if score > best_score:
-                    best_score = score
-                game_state = "gameover"
+        if not special_event and not invincible:
+            for pipe in pipes:
+                if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect): # Check for collision with pipes
+                    if score > best_score:
+                        best_score = score
+                    game_state = "gameover"
 
         #Check if the bird has hit the top or bottom of the screen
         if bird.rect.top <= 0 or bird.rect.bottom >= HEIGHT:
