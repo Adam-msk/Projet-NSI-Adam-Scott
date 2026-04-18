@@ -80,6 +80,7 @@ SPECIAL_EVENT_DURATION = 5000 # Duration of the special event in milliseconds
 invincible = False # Flag to indicate if the bird is currently invincible
 invincible_timer = 0
 INVINCIBILITY_DURATION = 3000 # Duration of invincibility in milliseconds
+special_event_triggered = False # Flag to ensure the special event is triggered only once per game
 # Main game loop
 while running:
     clock.tick(FPS)
@@ -145,10 +146,11 @@ while running:
         if game_started and distance_since_last_pipe >= pipe_spacing:
             pipes.append(Pipe(WIDTH, current_gap, scroll_speed))
             distance_since_last_pipe = 0
-            if not special_event and random.randint(1, 20) == 1:  # 5% odds to trigger the special event when a new pipe is generated
+            if not special_event and not special_event_triggered and random.randint(1, 20) == 1:  # 5% odds to trigger the special event when a new pipe is generated
                 special_event = True
                 special_event_timer = pygame.time.get_ticks()
-        current_gap = max(160, 250 - score * 4) # Decrease the gap size as the score increases, with a minimum gap of 160 
+                special_event_triggered = True
+        current_gap = max(160, 250 - score * 5) # Decrease the gap size as the score increases, with a minimum gap of 160 
         bg_x -= scroll_speed
         if special_event:
             screen.blit(special_background, (bg_x, 0))
