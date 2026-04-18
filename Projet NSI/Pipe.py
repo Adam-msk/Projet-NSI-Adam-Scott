@@ -10,13 +10,13 @@ PIPE_IMG = pygame.transform.scale(PIPE_IMG, (80, 500)) #Scale the pipe image to 
 
 # Define the Pipe class
 class Pipe:
-    def __init__(self, x):
+    def __init__(self, x, gap, speed):
         """Initializes the Pipe. Loads the pipe image and sets the initial position of the pipe.
         The pipe is randomly positioned vertically to create a gap for the bird to pass through. 
         """ 
-        self.gap = 160
         self.x = x
-        self.speed = 2
+        self.gap = gap
+        self.speed = speed
 
         self.height = random.randint(150, 450)
 
@@ -32,7 +32,7 @@ class Pipe:
         self.top_rect.x = self.x
         self.bottom_rect.x = self.x
 
-    def draw(self, screen, hidden = False):
+    def draw(self, screen, hidden=False):
         if not hidden:
             screen.blit(self.top_img, (self.top_rect.x, self.top_rect.bottom - self.top_img.get_height())) #Draw the top pipe
             screen.blit(self.bottom_img, (self.bottom_rect.x, self.bottom_rect.y)) #Draw the bottom pipe
