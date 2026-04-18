@@ -35,6 +35,8 @@ restart_button = pygame.image.load(f"{curdir}/images/restart_button.png").conver
 restart_button = pygame.transform.scale(restart_button, (350, 300))
 special_background = pygame.image.load(f"{curdir}/images/special.png").convert()
 special_background = pygame.transform.scale(special_background, (WIDTH, HEIGHT))
+heart_img = pygame.image.load(f"{curdir}/images/heart.png").convert_alpha()
+heart_img = pygame.transform.scale(heart_img, (50, 50 ))
 restart_rect = restart_button.get_rect(center=(400, 370))
 start_rect = start_button.get_rect(center=(400, 370))
 button_rect = start_button.get_rect()
@@ -79,8 +81,9 @@ special_event_timer = 0
 SPECIAL_EVENT_DURATION = 5000 # Duration of the special event in milliseconds
 invincible = False # Flag to indicate if the bird is currently invincible
 invincible_timer = 0
-INVINCIBILITY_DURATION = 3000 # Duration of invincibility in milliseconds
+INVINCIBILITY_DURATION = 1700 # Duration of invincibility in milliseconds
 special_event_triggered = False # Flag to ensure the special event is triggered only once per game
+lives = 3 # Number of lives the player has
 # Main game loop
 while running:
     clock.tick(FPS)
@@ -118,6 +121,8 @@ while running:
                     special_event_timer = 0
                     invincible = False
                     invincible_timer = 0
+                    lives = 3
+                    special_event_triggered = False
 
         if game_state == "game":
             if event.type == pygame.KEYDOWN:
@@ -201,6 +206,8 @@ while running:
                 if score_sound:
                     score_sound.set_volume(0.2)
                     score_sound.play()
+        for i in range(lives):
+            screen.blit(heart_img, (20 + i * 35, 50))
         score_text = font.render(str(score), True, (255, 255, 255))
         screen.blit(score_text, (WIDTH // 2, 50))
         pipes = [pipe for pipe in pipes if not pipe.off_screen()] # Remove pipes that have moved off screen 
@@ -208,15 +215,26 @@ while running:
         if not special_event and not invincible:
             for pipe in pipes:
                 if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect): # Check for collision with pipes
+                    lives -= 1
+                    if lives <= 0:
+                        if score > best_score:
+                            best_score = score
+                        game_state = "gameover"
+                    else:
+                        bird = Bird()  # Reset bird position after losing a life
+                        invincible = True
+                        invincible_timer = pygame.time.get_ticks() # Start invincibility timer after losing a life
+
+            if not invincible and (bird.rect.top <= 0 or bird.rect.bottom >= HEIGHT): #Check if the bird has hit the top or bottom of the screen
+                lives -= 1
+                if lives <= 0:
                     if score > best_score:
                         best_score = score
                     game_state = "gameover"
-
-        #Check if the bird has hit the top or bottom of the screen
-        if bird.rect.top <= 0 or bird.rect.bottom >= HEIGHT:
-            if score > best_score:
-                best_score = score
-            game_state = "gameover"
+                else:
+                    bird = Bird()  # Reset bird position after losing a life
+                    invincible = True
+                    invincible_timer = pygame.time.get_ticks() # Start invincibility timer after losing a life
 
     elif game_state == "gameover":
         best_score_text = font.render(f"Best Score: {best_score}", True, (255,255,255))
